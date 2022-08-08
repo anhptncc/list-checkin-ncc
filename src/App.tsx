@@ -1,24 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import axios from 'axios';
+
+interface IUser {
+  branch: string;
+  checkInAt: string;
+  emailAddress: string;
+  fullName: string;
+  img: string;
+  type: string;
+}
+
+const getImages = () => {
+  return axios.get(
+    'https://ims-api.nccsoft.vn/api/services/app/FaceId/GetListImage'
+  );
+};
 
 function App() {
+  const [listImg, setListImg] = useState<IUser[]>([]);
+
+  useEffect(() => {
+    getImages().then((res) => setListImg(res.data.result));
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      {listImg.map((item, index) => (
+        <div className='box'>
+          <img key={index} src={item.img} alt='index' />
+          <p className='text name'>{item.fullName}</p>
+          <p className='text'>
+            {item.branch} - {item.type}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
