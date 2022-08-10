@@ -13,7 +13,14 @@ interface IUser {
 
 const getImages = () => {
   return axios.get(
-    'https://ims-api.nccsoft.vn/api/services/app/FaceId/GetListImage'
+    'https://ims-api.nccsoft.vn/api/services/app/FaceId/GetListImage',
+    {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers':
+          'Origin, X-Requested-With, Content-Type, Accept',
+      },
+    }
   );
 };
 
