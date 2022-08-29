@@ -82,6 +82,7 @@ function App() {
             <p className='text'>
               {item.branch} - {item.type}
             </p>
+            <p className='text'>{item.checkInAt}</p>
           </div>
         ))}
       </div>
