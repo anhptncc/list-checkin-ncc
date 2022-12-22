@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import './App.css';
-import axios from 'axios';
+import { TextField } from '@mui/material';
 import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
+import axios from 'axios';
+import { useEffect, useMemo, useState } from 'react';
+import './App.css';
 
 interface IUser {
   branch: string;
@@ -34,10 +35,22 @@ enum EBranch {
 
 const ListBranch = ['All', 'HN1', 'HN2', 'ĐN', 'SG1', 'SG2', 'Vinh'];
 
+function removeAccents(str: string) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim();
+}
+
 function App() {
+  const [originListImg, setOriginListImg] = useState<IUser[]>([]);
   const [listImg, setListImg] = useState<IUser[]>([]);
 
   const [branch, setBranch] = useState(EBranch.All);
+  const [name, setName] = useState('');
 
   const list = useMemo(() => {
     if (branch)
@@ -46,14 +59,25 @@ function App() {
   }, [branch, listImg]);
 
   useEffect(() => {
-    getImages().then((res) => setListImg(res.data.result));
+    getImages().then((res) => setOriginListImg(res.data.result));
   }, []);
+
+  useEffect(() => {
+    let list = [...originListImg];
+    if (name) {
+      list = list.filter((item) =>
+        removeAccents(item.fullName).includes(removeAccents(name))
+      );
+    }
+    setListImg(list);
+  }, [name, listImg, originListImg]);
 
   return (
     <div className='App'>
+      <h1>NCC checkout</h1>
       <div className='header'>
-        <Box sx={{ width: 150 }}>
-          <FormControl fullWidth>
+        <Box sx={{ display: 'flex', gap: 5 }}>
+          <FormControl fullWidth sx={{ width: 180 }}>
             <InputLabel id='branch'>Branch</InputLabel>
             <Select
               labelId='branch'
@@ -65,6 +89,15 @@ function App() {
                 <MenuItem value={index}>{item}</MenuItem>
               ))}
             </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ width: 200 }}>
+            <TextField
+              id='outlined-basic'
+              label='Name'
+              variant='outlined'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </FormControl>
         </Box>
       </div>
